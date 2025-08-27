@@ -1,0 +1,74 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+// Konfigurasi WiFi
+const char* ssid = "KONTRAKAN 5 BATANG";
+const char* password = "Akuikhlas";
+// Konfigurasi Antares API
+const char* antaresUrl = "https://platform.antares.id:8443/~/antares-cse/antares￾id/TESHidroponik/HasilSensor";
+const char* antaresOrigin = "c3d8f2397d912e73:0c9b7c4c1b564a5b";
+// Variabel data sensor
+float pHValue = 6.5;
+int tdsValue = 500;
+float waterTemp = 25.3;
+// Fungsi untuk menghubungkan ke WiFi
+void setupWiFi() {
+ WiFi.begin(ssid, password);
+ while (WiFi.status() != WL_CONNECTED) {
+ delay(1000);
+ Serial.print(".");
+ }
+ Serial.println("\nWiFi Terhubung!");
+// Fungsi untuk mengirim data ke Antares
+void sendToAntares() {
+ if (WiFi.status() == WL_CONNECTED) {
+ HTTPClient http;
+ http.begin(antaresUrl);
+ http.addHeader("Content-Type", "application/json;ty=4");
+ http.addHeader("X-M2M-Origin", antaresOrigin);
+ http.addHeader("Accept", "application/json");
+ // Format data JSON
+ String jsonData = "{\"m2m:cin\": {\"con\": \"{\\\"pH\\\": " + String(pHValue) 
++ ", \\\"TDS\\\": " + String(tdsValue) + ", \\\"SuhuAir\\\": " + String(waterTemp) 
++ "}\"}}";
+ int httpResponseCode = http.POST(jsonData);
+ Serial.println(httpResponseCode == 201 ? "Data berhasil terkirim ke 
+Antares!" : "Gagal mengirim data.");
+ http.end();
+ } else {
+ Serial.println("WiFi tidak terhubung.");
+ }
+}
+void setup() {
+ Serial.begin(115200);
+ setupWiFi();
+ sendToAntares();
+}
+void loop() {
+ // Tidak ada yang perlu dilakukan dalam loop
+}
+// Fungsi untuk mengirim data ke Antares
+void sendToAntares() {
+ if (WiFi.status() == WL_CONNECTED) {
+ HTTPClient http;
+ http.begin(antaresUrl);
+ http.addHeader("Content-Type", "application/json;ty=4");
+ http.addHeader("X-M2M-Origin", antaresOrigin);
+ http.addHeader("Accept", "application/json");
+ // Format data JSON
+ String jsonData = "{\"m2m:cin\": {\"con\": \"{\\\"pH\\\": " + String(pHValue) 
++ ", \\\"TDS\\\": " + String(tdsValue) + ", \\\"SuhuAir\\\": " + String(waterTemp) 
++ "}\"}}";
+ int httpResponseCode = http.POST(jsonData);
+ Serial.println(httpResponseCode == 201 ? 
+ http.end();
+ } else 
+{ Serial.println("WiFi tidak terhubung."); }
+}
+void setup() {
+ Serial.begin(115200);
+ setupWiFi();
+ sendToAntares();
+}
+void loop() {
+ // Tidak ada yang perlu dilakukan dalam loop
+}
